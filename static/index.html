@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>conflation-browser</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='/mbgl/mapbox-gl.js?v=0.50.0'></script>
+    <link rel='stylesheet' href='/mbgl/mapbox-gl.css' />
+    <script src='conflation-browser.js'></script>
+    <script src='osmgraph.js'></script>
+	<link rel="stylesheet" href="/leaflet/leaflet.css" />
+	<script src="/leaflet/leaflet.js"></script>
+
+	<!-- fetch latest versions from
+	    https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js
+	    https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css
+	-->
+    <style>
+        body { margin:0; padding:0; font-family: Helvetica Neue, Helvetica, Arial; letter-spacing: 0.2px; font-size: small; }
+		#map {
+			position: absolute;
+			background-color: #AAD3DF;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			height: 100%;
+			width: calc(60% - 4px);
+			border-right: 4px solid white;
+		}
+
+		#leaflet {
+			position: absolute;
+			right: 0;
+			top: 0;
+			height: 60%;
+			width: 40%;
+			background-color: #E6E9ED;
+		}
+
+		#proposed {
+			position: absolute;
+			bottom: 10%;
+			right: 0;
+			height: 30%;
+			width: 40%;
+			background-color: white;
+		}
+
+		#upload {
+			position: absolute;
+			bottom: 0;
+			right: 0;
+			height: 10%;
+			width: 40%;
+			color: #637381;
+			background-color: #EEE;
+		}
+		#upload>* { padding: 6px; }
+    </style>
+</head>
+<body onload='fetchMetadata()'>
+	<div id='map'></div>
+	<div id='leaflet'></div>
+	<div id='proposed'>
+		<div>Candidate <span id='proposedIndex'>-</span> of <span id='proposedCount'>-</span>
+		   <button id='nextButton' onclick='nextProposed()'>Next ></button></div>
+		<div id='changes'></div>
+		<button id='acceptButton' onclick='acceptProposed()'>Accept</button>
+		<button id='ignoreButton' onclick='ignoreProposed()'>Ignore</button>
+	</div>
+	<div id='upload'>
+		<div><span id='editCount'>0</span> changes: <button id='uploadButton' onclick='uploadEdits()'>Upload</button></div>
+		<div>
+			<input id='username' name='username' placeholder='OSM username'>
+			<input id='password' name='password' type='password' placeholder='OSM password'>
+		</div>
+
+	</div>
+</body>
+</html>

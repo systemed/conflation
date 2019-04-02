@@ -1,0 +1,20 @@
+{
+	"layers": {
+		"crossings": 	{ "minzoom": 9, "maxzoom": 14, "source": "shp/OOCIE_Crossing.shp", "source_columns": true },
+		"hazards": 		{ "minzoom": 9, "maxzoom": 14, "source": "shp/OOCIE_Hazard.shp",   "source_columns": true },
+		"junctions":	{ "minzoom": 9, "maxzoom": 14, "source": "shp/OOCIE_Junction.shp", "source_columns": true },
+		"routes":		{ "minzoom": 9, "maxzoom": 14, "source": "shp/OOCIE_Route.shp",    "source_columns": true },
+		"signals":      { "minzoom": 9, "maxzoom": 14, "source": "shp/OOCIE_Traffic_Signal.shp", "source_columns": true }
+	},
+	"settings": {
+		"minzoom": 7,
+		"maxzoom": 14,
+		"basezoom": 14,
+		"include_ids": false,
+		"name": "OOCIE",
+		"version": "0.1",
+		"description": "Test vector tiles for OOCIE",
+		"compress": "gzip",
+		"bounding_box": [-1.5553,51.7500,-1.3293,51.8833]
+	}
+}
