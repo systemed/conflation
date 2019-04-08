@@ -1,8 +1,3 @@
-# conflation-server oocie.mbtiles
-
-# - Serves static files (.osm, .kml, .geojson, licence/readme, conflation-browser HTML/JS/CSS)
-# - Serves vector tiles from mbtiles (complete with permissive CORS headers)
-
 require 'sqlite3'
 begin; require 'glug'	# Optional glug dependency
 rescue LoadError; end 	#  |
@@ -19,16 +14,18 @@ class ConflationServer
 
 	def initialize(mbtiles)
 		@@mbtiles = mbtiles
+		ConflationServer.connect
 	end
 
 	def self.connect
 		@@db = SQLite3::Database.new(@@mbtiles)
-		Dir.chdir("static")
+		Dir.chdir("static") unless Dir.pwd.include?("static")
 		self
 	end
 
 	def call(env)
-		path = env['REQUEST_PATH'].sub(/^\//,'')
+		path = (env['REQUEST_PATH'] || env['REQUEST_URI']).sub(/^\//,'')
+		if path.empty? then path='index.html' end
 		if path =~ %r!(\d+)/(\d+)/(\d+).*\.pbf!
 			# Serve .pbf tile from mbtiles
 			z,x,y = $1.to_i, $2.to_i, $3.to_i
@@ -72,7 +69,6 @@ class ConflationServer
 
 	if defined?(PhusionPassenger)
 		puts "Starting Passenger server"
-		ConflationServer.connect
 		PhusionPassenger.on_event(:starting_worker_process) do |forked|
 			if forked then ConflationServer.connect end
 		end
@@ -82,7 +78,6 @@ class ConflationServer
 		require 'rack'
 
 		server = ConflationServer.new(ARGV[0])
-		ConflationServer.connect
 		app = Proc.new do |env|
 			server.call(env)
 		end
