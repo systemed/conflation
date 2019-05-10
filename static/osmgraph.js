@@ -232,6 +232,17 @@ class Node {
 	asLeafletHighlight() {
 		return L.marker([this.lat,this.lon]);
 	}
+	parentWaysWithKey(k,graph) {
+		// **** This is very slow - ideally we want a reverse index
+		var parentWays = [];
+		for (var id in graph.ways) {
+			var way = graph.ways[id];
+			if (way.nodes.indexOf(this)>-1 && way.tags[k]) {
+				parentWays.push(way);
+			}
+		}
+		return parentWays;
+	}
 	toXML(xml,changesetID) {
 		var node = xml.createElement("node");
 		node.setAttribute("id",this.id);

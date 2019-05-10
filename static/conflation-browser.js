@@ -374,7 +374,15 @@
 	function findCandidates(feature,latlng,graph) {
 		var sets;	// should we look through nodes, ways, relations?
 		var filter;	// filter function to get the correct type (e.g. only POI nodes, or only closed ways)
-		if (feature.layer.type=='circle') {
+		if (feature.properties['_filter']) {
+			// if we have an explicit filter type, use that
+			// **** only waynode:(tag) supported at present
+			var wayKey = feature.properties['_filter'].split(':')[1];
+			sets = [graph.nodes];
+			filter = function(obj) {
+				return !obj.poi && obj.parentWaysWithKey(wayKey,graph).length>0;
+			}
+		} else if (feature.layer.type=='circle') {
 			// if it's a circle, look for POI nodes or closed ways
 			sets = [graph.nodes, graph.ways, graph.relations];
 			filter = function(obj) {
@@ -427,7 +435,9 @@
 				score = Math.max(feature.properties[k]==tags[k] ? 3 : 1, score);
 			}
 		}
-		if (tags[feature.properties['_match_key']]) { score = Math.max(1,score); }
+		// _match_key allows us to look for a particular key
+		var mk = feature.properties['_match_key'];
+		if (tags[mk] || (mk=="" && !tags[mk])) { score = Math.max(1,score); }
 		// custom matches
 		// highway=path/footway/cycleway equivalent
 		if (feature.properties['highway']=='path' && (tags['highway']=='cycleway' || tags['highway']=='footway')) { score=2; }
