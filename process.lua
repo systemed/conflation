@@ -4,7 +4,7 @@ hazards = { ["Barrier Types"] = { "barrier", "yes"} ,
 			["Bus Stops"] = { "highway", "bus_stop" } }
 
 routes =  { ["Off-Road"] = { "highway", "cycleway" } ,
-			["On-Road"] = { "cycleway", "lane" } ,
+			["On-Road"] = { "_match_key", "highway" } ,
 			["Parallel"] = { "highway", "cycleway" } }
 
 lights =  { ["None"] = { "lit", "no" },
@@ -14,10 +14,6 @@ surfaces= { ["Coloured Surface"] = { "surface", "asphalt" },
 			["Tarmac"] = { "surface", "asphalt" },
 			["Unbound Hardcore"] = { "surface", "gravel" } }
 
-bumps =   { ["Bumpy"] = { "tracktype", "grade2" },
-			["Rough"] = { "tracktype", "grade3" },
-			["Smooth"] = { "tracktype", "grade1" } }
-
 widths =  { ["Narrow"] = { "width", "<1.5m" },
 			["Very Narrow"] = { "width", "<1m" } }
 
@@ -26,6 +22,9 @@ speeds =  { ["30"] = { "maxspeed", "30 mph" },
 			["50"] = { "maxspeed", "50 mph" },
 			["NSL"]= { "maxspeed", "60 mph" } }
 
+crossings={ ["Refuge"]= { "crossing", "island" },
+			["Zebra"] = { "crossing", "zebra" } }
+
 function attribute_function(attr)
 	local tags = {}
 	
@@ -33,10 +32,10 @@ function attribute_function(attr)
 	remap_tags(tags,attr,"RouteType" , routes)
 	remap_tags(tags,attr,"Lighting"  , lights)
 	remap_tags(tags,attr,"SurfaceMat", surfaces)
-	remap_tags(tags,attr,"SurfaceCon", bumps)
 	remap_tags(tags,attr,"CycleLaneW", widths)
 	remap_tags(tags,attr,"CycleTrack", widths)
 	remap_tags(tags,attr,"SpeedLimit", speeds)
+	remap_tags(tags,attr,"CrossingTy", crossings)
 
 	if attr["Comment"] and attr["Comment"]~="" then tags["_comment"]=attr["Comment"] end
 	tags["id"] = attr["GlobalID"]
