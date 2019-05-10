@@ -427,6 +427,7 @@
 				score = Math.max(feature.properties[k]==tags[k] ? 3 : 1, score);
 			}
 		}
+		if (tags[feature.properties['_match_key']]) { score = Math.max(1,score); }
 		// custom matches
 		// highway=path/footway/cycleway equivalent
 		if (feature.properties['highway']=='path' && (tags['highway']=='cycleway' || tags['highway']=='footway')) { score=2; }
