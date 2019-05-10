@@ -112,6 +112,9 @@
 			maxNativeZoom: 19,
 			maxZoom: 22 }).addTo(leafletMap);
 			
+		// Set up keyboard listener for fast edits
+		document.addEventListener("keydown", keyListener);
+
 		// Initialise UI
 		clearProposedEdits();
 	}
@@ -258,9 +261,11 @@
 				changes.push({ name: k, description: "Change tag "+k+" to "+edit.tags[k]+" (from "+edit.obj.tags[k]+")" })
 			}
 		}
+		var ct=0;
 		byId('changes').innerHTML = "<div>" + changes.map(function(c) {
 			if (c.name) {
-				return "<input type='checkbox' class='tag_change' name='"+c.name+"' checked>"+c.description+"<br/>";
+				ct++;
+				return "<input type='checkbox' class='tag_change' name='"+c.name+"' id='toggle"+ct+"' checked>"+c.description+" "+String.fromCharCode(9311+ct)+"<br/>";
 			} else {
 				return c.description+"<br/>";
 			}
@@ -277,6 +282,7 @@
 	}
 
 	function nextProposed() {
+		if (!proposedEdits) return;
 		displayedEdit = (displayedEdit+1) % proposedEdits.length;
 		renderProposedEdit();
 	}
@@ -285,6 +291,7 @@
 	// Accept/reject changes
 	
 	function acceptProposed() {
+		if (!selectedFeature) return;
 		if (popup) { popup.remove(); popup=null; }
 		if (leafletFeature) { leafletMap.removeLayer(leafletFeature); leafletFeature = null; }
 		hideFeature(selectedFeature.properties.id);
@@ -328,6 +335,7 @@
 		}
 	}
 	function ignoreProposed() {
+		if (!selectedFeature) return;
 		if (popup) { popup.remove(); popup=null; }
 		if (leafletFeature) { leafletMap.removeLayer(leafletFeature); leafletFeature = null; }
 		hideFeature(selectedFeature.properties.id);
@@ -426,6 +434,28 @@
 		if (feature.properties['cycleway'] && tags['highway']) { score=1.5; }
 		// **** could add lots more here
 		return score;
+	}
+
+	// ============================================================================================================================================
+	// Keyboard listener for fast edits
+	
+	function keyListener(event) {
+		if (document.activeElement.nodeName=="INPUT") return; // don't hijack text entry
+		if (event.key=="Enter") {
+			// accept change
+			acceptProposed();
+		} else if (event.key=="Backspace") {
+			// ignore change
+			ignoreProposed();
+		} else if (event.key==" ") {
+			// next candidate
+			nextProposed();
+			event.stopImmediatePropagation();
+		} else if (event.keyCode>=49 && event.keyCode<=57) {
+			// toggle checkbox
+			var el = byId("toggle"+event.key);
+			if (el) el.checked=!el.checked;
+		}
 	}
 
 	// ============================================================================================================================================
