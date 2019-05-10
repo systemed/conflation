@@ -1,7 +1,7 @@
 
 	// Globals
 	
-	var glMap, style={}, graph, popup, proposedEdits, displayedEdit, leafletMap, leafletHighlight, selectedFeature, changesetID;
+	var glMap, style={}, graph, popup, proposedEdits, displayedEdit, leafletMap, leafletFeature, leafletCandidate, selectedFeature, changesetID;
 	var TOP_LEVEL = ["aeroway","amenity","barrier","boundary","building","emergency","entrance","highway","historic","landuse",
 		"leisure", "man_made", "natural", "office", "place", "power", "public_transport", "railway", "route", "shop", "traffic_sign",
 		"tourism", "waterway"];
@@ -122,6 +122,7 @@
 	// Clicked a feature so find nearby features
 	function featureClicked(e) {
 		if (popup) popup.remove();
+		if (leafletFeature) { leafletMap.removeLayer(leafletFeature); leafletFeature = null; }
 
 		// Look for features around the point
 		var bbox = [[e.point.x - 5, e.point.y - 5], [e.point.x + 5, e.point.y + 5]];
@@ -149,6 +150,21 @@
 			.setHTML(html)
 			.addTo(glMap);
 		fetchOSMAPI(feature, glMap.unproject(e.point));
+
+		// Highlight feature on Leaflet map too
+		var geom = JSON.parse(JSON.stringify(feature.geometry));
+		if (feature.layer.type=='circle') {
+			leafletFeature = L.circle(geom.coordinates.reverse(), { radius: 50, fillColor: "#FF0000", fillOpacity: 0.2, stroke: false } ).addTo(leafletMap);
+		} else if (feature.layer.type=='line') {
+			leafletFeature = L.polyline(geom.coordinates.map(pt => pt.reverse()), { color: "#00FFFF", weight: 15, opacity: 0.5 } ).addTo(leafletMap);
+		}
+		if (leafletFeature) {
+			var b1 = leafletFeature.getBounds();
+			var b2 = leafletMap.getBounds();
+			if (!b1.intersects(b2)) {
+				leafletMap.fitBounds(b1, { maxZoom: leafletMap.getZoom() });
+			}
+		}
 	}
 
 	// Fetch OSM data near the selected feature
@@ -216,17 +232,17 @@
 		byId('proposedCount').innerHTML = proposedEdits.length;
 
 		// Render a Leaflet object
-		if (leafletHighlight) { leafletMap.removeLayer(leafletHighlight); leafletHighlight=null; }
+		if (leafletCandidate) { leafletMap.removeLayer(leafletCandidate); leafletCandidate=null; }
 		if (edit.action=='modify') {
-			leafletHighlight = edit.obj.asLeafletHighlight();
+			leafletCandidate = edit.obj.asLeafletHighlight();
 		} else if (edit.type=='Node') {
-			leafletHighlight = L.marker(edit.geometry.coordinates.reverse());
+			leafletCandidate = L.marker(edit.geometry.coordinates.reverse());
 		} else if (edit.type=='Way') {
-			leafletHighlight = L.polyline(edit.geometry.coordinates.map(pt => pt.reverse()));
+			leafletCandidate = L.polyline(edit.geometry.coordinates.map(pt => pt.reverse()));
 		} else {
 			console.log("Unrecognised edit",edit);
 		}
-		leafletHighlight.addTo(leafletMap);
+		leafletCandidate.addTo(leafletMap);
 
 		// Assemble a textual list and put it the "proposed" pane
 		var changes = [];
@@ -270,6 +286,7 @@
 	
 	function acceptProposed() {
 		if (popup) { popup.remove(); popup=null; }
+		if (leafletFeature) { leafletMap.removeLayer(leafletFeature); leafletFeature = null; }
 		hideFeature(selectedFeature.properties.id);
 		byId('editCount').innerHTML = Number(byId('editCount').innerHTML)+1;
 		applyChange(proposedEdits[displayedEdit]);
@@ -312,6 +329,7 @@
 	}
 	function ignoreProposed() {
 		if (popup) { popup.remove(); popup=null; }
+		if (leafletFeature) { leafletMap.removeLayer(leafletFeature); leafletFeature = null; }
 		hideFeature(selectedFeature.properties.id);
 		clearProposedEdits();
 	}
