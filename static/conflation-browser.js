@@ -50,6 +50,7 @@
 				"maxzoom": 22
 			}]
 		};
+		var polygonLayers=[], pointLayers=[], polylineLayers=[];
 		for (const src of metadata.json.vector_layers) {
 			var base = {
 				"source": "conflation",
@@ -72,8 +73,8 @@
 				"filter": ["all", 
 					["match", ["geometry-type"], ["Point", "MultiPoint"], true, false],
 					["match", ["get","id"], ["ZZZ"], false, true]
-				]
-				// layout, paint
+				],
+				"paint": { "circle-color": "#FF0000", "circle-radius": 8 }
 			};
 			var polylineLayer = {
 				"id": src.id+"_line",
@@ -82,13 +83,14 @@
 				"filter": ["all", 
 					["match", ["geometry-type"], ["LineString", "MultiLineString"], true, false],
 					["match", ["get","id"], ["ZZZ"], false, true]
-				]
-				// layout, paint
+				],
+				"paint": { "line-color": "#00FFFF", "line-width": 3 }
 			};
-			Object.assign(polygonLayer, base);  style.layers.push(polygonLayer);
-			Object.assign(pointLayer, base);    style.layers.push(pointLayer);
-			Object.assign(polylineLayer, base); style.layers.push(polylineLayer);
+			Object.assign(polygonLayer, base);  polygonLayers.push(polygonLayer);
+			Object.assign(pointLayer, base);    pointLayers.push(pointLayer);
+			Object.assign(polylineLayer, base); polylineLayers.push(polylineLayer);
 		}
+		style.layers = style.layers.concat(polygonLayers, polylineLayers, pointLayers);
 
 		var centre = [(bbox[0]+bbox[2])/2, (bbox[1]+bbox[3])/2];
 		glMap = new mapboxgl.Map({
