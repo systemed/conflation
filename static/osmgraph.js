@@ -294,6 +294,9 @@ class Way {
 	isClosed() {
 		return this.nodes[0]==this.nodes[this.nodes.length-1];
 	}
+	isArea() {
+		return this.isClosed() && (!this.tags['highway'] || this.tags['area']=='yes');
+	}
 	encloses(latlng) {
 		var y = latlng.lat, x = latlng.lng;
 		var inside = false;
@@ -339,6 +342,7 @@ class Relation {
 	distanceFrom(latlng) { var o = this.findOuter(); return o ? o.distanceFrom(latlng) : null; }
 	distanceFromFeature(feature) { var o = this.findOuter(); return o ? o.distanceFromFeature(latlng) : null; }
 	isClosed() { var o = this.findOuter(); return o ? o.isClosed() : false; }
+	isArea() { return this.isClosed(); }
 	encloses(latlng) { var o = this.findOuter(); return o ? o.encloses(latlng) : false; }
 	toXML(xml,changesetID) {
 		var rel = xml.createElement("relation");

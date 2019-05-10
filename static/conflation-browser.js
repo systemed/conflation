@@ -389,18 +389,18 @@
 				if (obj.constructor.name=='Node') {
 					return obj.poi;
 				} else {
-					return obj.isClosed();
+					return obj.isArea();
 				}
 			}
 		} else if (feature.layer.type=='line') {
 			// if it's a line, look for unclosed ways
 			sets = [graph.ways];
-			filter = function(obj) { return !obj.isClosed(); }
+			filter = function(obj) { return !obj.isArea(); }
 			
 		} else if (feature.layer.type=='fill') {
 			// if it's a polygon, look for closed ways/multipolygons
 			sets = [graph.ways, graph.relations];
-			filter = function(obj) { return obj.isClosed(); }
+			filter = function(obj) { return obj.isArea(); }
 		}
 
 		var candidates = [];
@@ -410,7 +410,6 @@
 				if (!filter(obj)) continue;										// filter on type
 				var c = compatible(feature,obj.tags); if (c==0) continue;		// filter on tags
 				var d = obj.distanceFrom(latlng); if (d.distance>150) continue;	// filter on distance
-				// **** closed highway ways aren't POIs and we shouldn't treat them as such
 				// **** if it's a way, we probably want to filter on "distance between polylines", not just from the clickpoint
 				//		(obviously a bit tricky because the way and feature will have different extents)
 				candidates.push( { distance: d.distance, score: c, obj: obj });
