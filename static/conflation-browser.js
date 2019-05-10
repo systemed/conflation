@@ -36,7 +36,7 @@
 				},
 				"conflation": {
 					"type": "vector",
-					"tiles": ["http://"+window.location.host+"/{z}/{x}/{y}.pbf"],
+					"tiles": [window.location.protocol+"//"+window.location.host+"/{z}/{x}/{y}.pbf"],
 					"minzoom": Number(metadata.minzoom),
 					"maxzoom": Number(metadata.maxzoom),
 					"scheme": "xyz"
@@ -105,8 +105,8 @@
 
 		// Initialise Leaflet map
 		leafletMap = L.map('leaflet').setView([centre[1],centre[0]],14);
-		var osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			attribution: "<a href='http://osm.org/copyright' target='_blank'>&copy; OpenStreetMap contributors</a> | Satellite imagery ©ESRI",
+		var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: "<a href='https://osm.org/copyright' target='_blank'>&copy; OpenStreetMap contributors</a> | Satellite imagery ©ESRI",
 			maxNativeZoom: 19,
 			maxZoom: 22 }).addTo(leafletMap);
 			
