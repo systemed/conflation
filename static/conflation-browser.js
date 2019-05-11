@@ -250,7 +250,8 @@
 		// Assemble a textual list and put it the "proposed" pane
 		var changes = [];
 		if (edit.action=='modify') {
-			changes.push({ name: null, description: "Modify "+edit.obj.constructor.name+" "+edit.obj.id });
+			changes.push({ name: null, description: "Modify "+edit.obj.constructor.name+" "+edit.obj.id+
+			 	" <a href='https://osm.org/"+edit.obj.constructor.name.toLowerCase()+"/"+edit.obj.id+"' target='_blank'>⧉</a>"});
 		} else {
 			changes.push({ name: null, description: "Create new "+edit.type });
 		}
