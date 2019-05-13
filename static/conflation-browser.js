@@ -295,6 +295,7 @@
 		if (!selectedFeature) return;
 		if (popup) { popup.remove(); popup=null; }
 		if (leafletFeature) { leafletMap.removeLayer(leafletFeature); leafletFeature = null; }
+		if (leafletCandidate) { leafletMap.removeLayer(leafletCandidate); leafletCandidate = null; }
 		hideFeature(selectedFeature.properties.id);
 		byId('editCount').innerHTML = Number(byId('editCount').innerHTML)+1;
 		applyChange(proposedEdits[displayedEdit]);
@@ -339,6 +340,7 @@
 		if (!selectedFeature) return;
 		if (popup) { popup.remove(); popup=null; }
 		if (leafletFeature) { leafletMap.removeLayer(leafletFeature); leafletFeature = null; }
+		if (leafletCandidate) { leafletMap.removeLayer(leafletCandidate); leafletCandidate = null; }
 		hideFeature(selectedFeature.properties.id);
 		clearProposedEdits();
 	}
