@@ -189,8 +189,14 @@
 		graph.setPOIFlag();
 		var candidates = findCandidates(feature,latlng,graph);
 		proposedEdits = [];
+		var existingMatchFound = false;
 		for (var candidate of candidates) {
 			var edit = calculateEditFor(candidate, feature);
+			if (edit.action=='match') {
+				// only add one 'match' object
+				if (existingMatchFound) continue;
+				existingMatchFound = true;
+			}
 			if (edit) proposedEdits.push(edit);
 		}
 		var edit = calculateNewObjectFor(feature,latlng);
@@ -211,7 +217,7 @@
 				}
 			}
 		}
-		if (ch==0) return null;
+		if (ch==0) return { action: 'match', obj: candidate.obj, tags: {} };
 		return { action: 'modify', obj: candidate.obj, tags: tags };
 	}
 	
@@ -236,7 +242,7 @@
 
 		// Render a Leaflet object
 		if (leafletCandidate) { leafletMap.removeLayer(leafletCandidate); leafletCandidate=null; }
-		if (edit.action=='modify') {
+		if (edit.action=='modify' || edit.action=='match') {
 			leafletCandidate = edit.obj.asLeafletHighlight();
 		} else if (edit.type=='Node') {
 			leafletCandidate = L.marker(edit.geometry.coordinates.reverse());
@@ -249,11 +255,16 @@
 
 		// Assemble a textual list and put it the "proposed" pane
 		var changes = [];
-		if (edit.action=='modify') {
-			changes.push({ name: null, description: "Modify "+edit.obj.constructor.name+" "+edit.obj.id+
-			 	" <a href='https://osm.org/"+edit.obj.constructor.name.toLowerCase()+"/"+edit.obj.id+"' target='_blank'>⧉</a>"});
-		} else {
+		if (edit.action=='create') {
 			changes.push({ name: null, description: "Create new "+edit.type });
+		} else {
+			var desc = edit.obj.constructor.name + " " + edit.obj.id +
+			           " <a href='https://osm.org/" + edit.obj.constructor.name.toLowerCase() + "/" + edit.obj.id + "' target='_blank'>⧉</a>";
+			if (edit.action=='modify') { 
+				changes.push({ name: null, description: "Modify "+desc });
+			} else { 
+				changes.push({ name: null, description: "Already matches "+desc });
+			}
 		}
 		for (var k in edit.tags) {
 			if (edit.action=='create' || !edit.obj.tags[k]) {
@@ -271,7 +282,8 @@
 				return c.description+"<br/>";
 			}
 		}).join('') + "</div>";
-		byId('nextButton').disabled = byId('acceptButton').disabled = byId('acceptAndKeepButton').disabled = byId('ignoreButton').disabled = false;
+		byId('nextButton').disabled = byId('ignoreButton').disabled = false;
+		byId('acceptButton').disabled = byId('acceptAndKeepButton').disabled = (edit.action=='match');
 	}
 	
 	// Clear proposed edit area
@@ -365,6 +377,7 @@
 			alert("Failed to upload data.");
 			response.text().then(text => console.log(response.status+": "+text));
 		} else {
+			alert("Your changes were successfully uploaded!");
 			console.log(response);
 			byId('editCount').innerHTML = "0";
 		}
@@ -419,8 +432,8 @@
 				candidates.push( { distance: d.distance, score: c, obj: obj });
 			}
 		}
-		candidates.sort(function(a,b) { return cmp( Math.sqrt(a.distance) + 10*a.score,
-													Math.sqrt(b.distance) + 10*b.score ) });
+		candidates.sort(function(a,b) { return cmp( Math.sqrt(a.distance) + 10*(3-a.score),
+													Math.sqrt(b.distance) + 10*(3-b.score) ) });
 		return candidates;
 	}
 	function cmp(a,b) {
