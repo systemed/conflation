@@ -22,8 +22,8 @@ speeds =  { ["30"] = { maxspeed = "30 mph" },
 			["50"] = { maxspeed = "50 mph" },
 			["NSL"]= { maxspeed = "60 mph" } }
 
-crossings={ ["Refuge"]= { crossing = "island", _filter = "waynode:highway", _match_key = "" },
-			["Zebra"] = { crossing = "zebra",  _filter = "waynode:highway", _match_key = "" } }
+crossings={ ["Refuge"]= { highway = "crossing", crossing = "island", _filter = "waynode:highway", _match_key = "" },
+			["Zebra"] = { highway = "crossing", crossing = "zebra",  _filter = "waynode:highway", _match_key = "" } }
 
 function attribute_function(attr)
 	local tags = {}
