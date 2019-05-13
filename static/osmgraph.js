@@ -225,6 +225,7 @@ class Node {
 		this.lat = Number(lat);
 		this.poi = true;
 		this.dirty = false;
+		this.parents = [];
 	}
 	distanceFrom(latlng) {
 		return { distance: OSMGraph.fastDistance(latlng.lat,latlng.lng,this.lat,this.lon), lat: this.lat, lon: this.lon }
@@ -233,12 +234,10 @@ class Node {
 		return L.marker([this.lat,this.lon]);
 	}
 	parentWaysWithKey(k,graph) {
-		// **** This is very slow - ideally we want a reverse index
 		var parentWays = [];
-		for (var id in graph.ways) {
-			var way = graph.ways[id];
-			if (way.nodes.indexOf(this)>-1 && way.tags[k]) {
-				parentWays.push(way);
+		for (var p of this.parents) {
+			if (p.constructor.name=='Way' && p.tags[k]) {
+				parentWays.push(p);
 			}
 		}
 		return parentWays;
@@ -261,6 +260,8 @@ class Way {
 		this.version = Number(version);
 		this.nodes = nodes;
 		this.dirty = false;
+		this.parents = [];
+		for (var n of this.nodes) { n.parents.push(this); }
 	}
 	distanceFrom(latlng) {
 		if (this.isClosed() && this.encloses(latlng)) return 0;
@@ -329,6 +330,8 @@ class Relation {
 		this.version = Number(version);
 		this.members = members;
 		this.dirty = false;
+		this.parents = [];
+		for (var m of this.members) { m.obj.parents.push(this); }
 	}
 	findOuter() {
 		if (this.tags['type']!='multipolygon') return null;
