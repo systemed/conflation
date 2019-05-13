@@ -271,7 +271,7 @@
 				return c.description+"<br/>";
 			}
 		}).join('') + "</div>";
-		byId('nextButton').disabled = byId('acceptButton').disabled = byId('ignoreButton').disabled = false;
+		byId('nextButton').disabled = byId('acceptButton').disabled = byId('acceptAndKeepButton').disabled = byId('ignoreButton').disabled = false;
 	}
 	
 	// Clear proposed edit area
@@ -279,7 +279,7 @@
 		byId('changes').innerHTML='';
 		byId('proposedIndex').innerHTML = '-';
 		byId('proposedCount').innerHTML = '-';
-		byId('nextButton').disabled = byId('acceptButton').disabled = byId('ignoreButton').disabled = true;
+		byId('nextButton').disabled = byId('acceptButton').disabled = byId('acceptAndKeepButton').disabled = byId('ignoreButton').disabled = true;
 	}
 
 	function nextProposed() {
@@ -291,12 +291,12 @@
 	// ============================================================================================================================================
 	// Accept/reject changes
 	
-	function acceptProposed() {
+	function acceptProposed(keep) {
 		if (!selectedFeature) return;
 		if (popup) { popup.remove(); popup=null; }
 		if (leafletFeature) { leafletMap.removeLayer(leafletFeature); leafletFeature = null; }
 		if (leafletCandidate) { leafletMap.removeLayer(leafletCandidate); leafletCandidate = null; }
-		hideFeature(selectedFeature.properties.id);
+		if (!keep) { hideFeature(selectedFeature.properties.id); }
 		byId('editCount').innerHTML = Number(byId('editCount').innerHTML)+1;
 		applyChange(proposedEdits[displayedEdit]);
 		clearProposedEdits();
@@ -410,6 +410,7 @@
 		for (var s of sets) {
 			for (var id in s) {
 				var obj = s[id];
+				if (obj.dirty) continue;										// don't suggest anything already changed
 				if (!filter(obj)) continue;										// filter on type
 				var c = compatible(feature,obj.tags); if (c==0) continue;		// filter on tags
 				var d = obj.distanceFrom(latlng); if (d.distance>150) continue;	// filter on distance
