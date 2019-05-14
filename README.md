@@ -41,9 +41,11 @@ Your source data is on the left, OSM on the right.
 
 The points and lines from your source data are overlaid on a satellite map. Clicking on any of these will identify OSM candidates to be modified, or a new geometry to be created. Use the 'Next >' button to page through the candidates. Each candidate is highlighted on the OSM map (top right) as you do so.
 
-Once you've chosen one, you can use the checkboxes to deselect any tags you don't want to be applied. Click 'Accept' to make the change. The source feature is temporarily removed from the left-hand map when you do so.
+Once you've chosen one, you can use the checkboxes to deselect any tags you don't want to be applied. Click 'Accept' to make the change. The source feature is temporarily removed from the left-hand map when you do so. (If you don't want to remove it - for example, if a source feature maps to more than one OSM feature - then click 'Accept and keep open').
 
 To upload your changes, enter your OSM username and password into the input fields; click 'Upload'; and enter a changeset comment.
+
+Keyboard shortcuts are available: 1-9 to toggle tags, Space to cycle through candidates, Enter to accept, Delete to ignore.
 
 ### Using vector tiles in iD
 
