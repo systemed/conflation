@@ -37,7 +37,8 @@ class ConflationServer
 					'Content-Type'    => 'application/x-protobuf', 
 					'Content-Encoding'=> 'gzip', 
 					'Content-Length'  => blob.bytesize.to_s, 
-					'Cache-Control'   => 'max-age=0'
+					'Cache-Control'   => 'max-age=0',
+					'Access-Control-Allow-Origin' => '*'
 				}, [blob]]
 			else
 				puts "Empty #{z}/#{x}/#{y}"
